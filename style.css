@@ -6,7 +6,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: #333;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -195,22 +195,22 @@ body {
   #root {
     padding: 10px;
   }
-  
+
   .page-title {
     font-size: 2rem;
   }
-  
+
   .episode-container {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .search-input,
   .episode-select {
     width: 100%;
     min-width: unset;
   }
-  
+
   .episode-card {
     margin: 0 10px;
   }
@@ -220,18 +220,18 @@ body {
   .page-title {
     font-size: 1.5rem;
   }
-  
+
   .search-input,
   .episode-select {
     font-size: 0.9rem;
     padding: 10px 12px;
   }
-  
+
   .episode-title {
     font-size: 1.1rem;
     padding: 0.8rem;
   }
-  
+
   .episode-summary {
     padding: 1rem;
     font-size: 0.9rem;
@@ -277,4 +277,22 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #764ba2;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #667eea;
+  padding: 2rem;
+  font-weight: 600;
+}
+
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #d63031;
+  padding: 2rem;
+  background: rgba(214, 48, 49, 0.1);
+  border-radius: 8px;
+  font-weight: 600;
 }
