@@ -39,10 +39,9 @@ async function fetchEpisodes(showId) {
     return cache.episodes[showId];
   }
 
-  const rootElem = document.getElementById("root");
-  const loadingDiv = document.querySelector(".loading");
-  if (!loadingDiv) {
-    rootElem.innerHTML = '<div class="loading">Loading episodes, please wait...</div>';
+  const episodeContainer = document.querySelector(".episode-container");
+  if (episodeContainer) {
+    episodeContainer.innerHTML = '<div class="loading">Loading episodes, please wait...</div>';
   }
 
   try {
@@ -55,11 +54,13 @@ async function fetchEpisodes(showId) {
     cache.episodes[showId] = data;
     return data;
   } catch (error) {
-    rootElem.innerHTML = '<div class="error">Failed to load episodes. Please try refreshing the page.</div>';
+    if (episodeContainer) {
+      episodeContainer.innerHTML = '<div class="error">Failed to load episodes. Please try refreshing the page.</div>';
+    }
     throw error;
   }
 }
-// test
+
 async function setup() {
   try {
     allShows = await fetchShows();
@@ -177,6 +178,9 @@ function createPageStructure() {
   episodeCount.id = "episode-count";
   episodeCount.className = "episode-count";
 
+  const episodeContainer = document.createElement("div");
+  episodeContainer.className = "episode-container";
+
   header.appendChild(title);
   showSection.appendChild(showSelect);
   searchSection.appendChild(searchInput);
@@ -187,6 +191,7 @@ function createPageStructure() {
   rootElem.appendChild(searchSection);
   rootElem.appendChild(selectorSection);
   rootElem.appendChild(episodeCount);
+  rootElem.appendChild(episodeContainer);
 }
 
 async function handleShowSelect(event) {
