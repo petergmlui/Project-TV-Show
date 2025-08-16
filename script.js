@@ -1,58 +1,159 @@
-//You can edit ALL of the code here
+let allEpisodes = [];
+let filteredEpisodes = [];
+
 function setup() {
-  const allEpisodes = getAllEpisodes();
-  makePageForEpisodes(allEpisodes);
+  allEpisodes = getAllEpisodes();
+  filteredEpisodes = allEpisodes;
+  createPageStructure();
+  makePageForEpisodes(filteredEpisodes);
+  updateEpisodeCount();
+}
+
+function createPageStructure() {
+  const rootElem = document.getElementById("root");
+  rootElem.innerHTML = "";
+
+  const header = document.createElement("div");
+  header.className = "header";
+  
+  const title = document.createElement("h1");
+  title.textContent = "TV Show Episodes";
+  title.className = "page-title";
+  
+  const searchSection = document.createElement("div");
+  searchSection.className = "search-section";
+  
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.id = "search-input";
+  searchInput.className = "search-input";
+  searchInput.placeholder = "Search episodes by name or summary...";
+  searchInput.addEventListener("input", handleSearch);
+  
+  const selectorSection = document.createElement("div");
+  selectorSection.className = "selector-section";
+  
+  const episodeSelect = document.createElement("select");
+  episodeSelect.id = "episode-select";
+  episodeSelect.className = "episode-select";
+  episodeSelect.addEventListener("change", handleEpisodeSelect);
+  
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "Select an episode...";
+  episodeSelect.appendChild(defaultOption);
+  
+  allEpisodes.forEach(episode => {
+    const option = document.createElement("option");
+    const episodeCode = `S${String(episode.season).padStart(2, "0")}E${String(episode.number).padStart(2, "0")}`;
+    option.value = episode.id;
+    option.textContent = `${episodeCode} - ${episode.name}`;
+    episodeSelect.appendChild(option);
+  });
+  
+  const episodeCount = document.createElement("div");
+  episodeCount.id = "episode-count";
+  episodeCount.className = "episode-count";
+  
+  header.appendChild(title);
+  searchSection.appendChild(searchInput);
+  selectorSection.appendChild(episodeSelect);
+  
+  rootElem.appendChild(header);
+  rootElem.appendChild(searchSection);
+  rootElem.appendChild(selectorSection);
+  rootElem.appendChild(episodeCount);
+}
+
+function handleSearch(event) {
+  const searchTerm = event.target.value.toLowerCase().trim();
+  
+  if (searchTerm === "") {
+    filteredEpisodes = allEpisodes;
+  } else {
+    filteredEpisodes = allEpisodes.filter(episode => {
+      const nameMatch = episode.name.toLowerCase().includes(searchTerm);
+      const summaryMatch = episode.summary.toLowerCase().includes(searchTerm);
+      return nameMatch || summaryMatch;
+    });
+  }
+  
+  makePageForEpisodes(filteredEpisodes);
+  updateEpisodeCount();
+  
+  document.getElementById("episode-select").value = "";
+}
+
+function handleEpisodeSelect(event) {
+  const selectedEpisodeId = parseInt(event.target.value);
+  
+  if (selectedEpisodeId) {
+    const selectedEpisode = allEpisodes.find(episode => episode.id === selectedEpisodeId);
+    if (selectedEpisode) {
+      filteredEpisodes = [selectedEpisode];
+      makePageForEpisodes(filteredEpisodes);
+      updateEpisodeCount();
+      
+      document.getElementById("search-input").value = "";
+      
+      setTimeout(() => {
+        const episodeElement = document.querySelector('.episode-card');
+        if (episodeElement) {
+          episodeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  } else {
+    filteredEpisodes = allEpisodes;
+    makePageForEpisodes(filteredEpisodes);
+    updateEpisodeCount();
+    document.getElementById("search-input").value = "";
+  }
+}
+
+function updateEpisodeCount() {
+  const countElement = document.getElementById("episode-count");
+  const count = filteredEpisodes.length;
+  const total = allEpisodes.length;
+  
+  if (count === total) {
+    countElement.textContent = `Showing all ${total} episodes`;
+  } else {
+    countElement.textContent = `Showing ${count} of ${total} episodes`;
+  }
 }
 
 function makePageForEpisodes(episodeList) {
-  // Get the root element by its ID
-  const rootElem = document.getElementById("root");
-  // Clear any existing content in the root element
-  rootElem.innerHTML = "";
+  let episodeContainer = document.querySelector(".episode-container");
+  if (episodeContainer) {
+    episodeContainer.innerHTML = "";
+  } else {
+    episodeContainer = document.createElement("div");
+    episodeContainer.className = "episode-container";
+    document.getElementById("root").appendChild(episodeContainer);
+  }
 
-  // Create a container div for the grid layout
-  const episodeContainer = document.createElement("div");
-  episodeContainer.className = "episode-container"; // Class for CSS later
-
-  // Show each episode in allEpisodes array
   for (let episode of episodeList) {
-    // Format episode code as SXXEXX
     const episodeCode = `S${String(episode.season).padStart(2, "0")}E${String(
       episode.number
     ).padStart(2, "0")}`;
-    // Create a div for the episode card
     const episodeDiv = document.createElement("div");
-    episodeDiv.className = "episode-card"; // Class for CSS later
-    // Add episode details
+    episodeDiv.className = "episode-card";
     episodeDiv.innerHTML = `
-      <h2>${episodeCode} - ${episode.name}</h2>
-      <img src="${episode.image.medium}" alt="${episode.name}">
-      <div>${episode.summary}</div>
+      <h2 class="episode-title">${episodeCode} - ${episode.name}</h2>
+      <img src="${episode.image.medium}" alt="${episode.name}" class="episode-image">
+      <div class="episode-summary">${episode.summary}</div>
     `;
-    // Append the episode card to the container
     episodeContainer.appendChild(episodeDiv);
   }
 
-  // Append the episode container to the root element
-  rootElem.appendChild(episodeContainer);
-
-  // // testing CSS for grid layout
-  // episodeContainer.style.display = "grid";
-  // episodeContainer.style.gridTemplateColumns =
-  //   "repeat(auto-fit, minmax(300px, 1fr))";
-  // episodeContainer.style.gap = "20px";
-  // episodeContainer.style.padding = "20px";
-  // for (let card of episodeContainer.children) {
-  //   card.style.border = "1px solid #ccc";
-  //   card.style.padding = "15px";
-  //   card.style.boxSizing = "border-box";
-  // }
-
-  // TVMaze credits
-  const credits = document.createElement("p");
-  credits.innerHTML = `Data originally sourced from <a href="https://www.tvmaze.com/" target="_blank">TVMaze.com</a>`;
-  rootElem.appendChild(credits);
+  let credits = document.querySelector(".credits");
+  if (!credits) {
+    credits = document.createElement("p");
+    credits.className = "credits";
+    credits.innerHTML = `Data originally sourced from <a href="https://www.tvmaze.com/" target="_blank">TVMaze.com</a>`;
+    document.getElementById("root").appendChild(credits);
+  }
 }
 
-// Run setup function when the window finishes loading
 window.onload = setup;
